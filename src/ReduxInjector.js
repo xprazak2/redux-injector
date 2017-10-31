@@ -1,8 +1,10 @@
 import { createStore, combineReducers } from 'redux';
 import { set, has } from 'lodash';
 
-let store = {};
-let combine = combineReducers;
+let store = {},
+    combine = combineReducers,
+    injectedReducers = {};
+
 
 function combineReducersRecurse(reducers) {
   // If this is a leaf or already combined.
@@ -41,15 +43,15 @@ export function createInjectStore(initialReducers, ...args) {
     ...args
   );
 
-  store.injectedReducers = initialReducers;
+  injectedReducers = initialReducers;
 
   return store;
 }
 
 export function injectReducer(key, reducer, force = false) {
   // If already set, do nothing.
-  if (has(store.injectedReducers, key) || force) return;
+  if (has(injectedReducers, key) || force) return;
 
-  set(store.injectedReducers, key, reducer);
-  store.replaceReducer(combineReducersRecurse(store.injectedReducers));
+  set(injectedReducers, key, reducer);
+  store.replaceReducer(combineReducersRecurse(injectedReducers));
 }
